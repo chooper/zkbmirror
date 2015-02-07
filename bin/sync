@@ -7,8 +7,11 @@ require 'excon'
 require 'sequel'
 require 'diskcached'
 
+# check for debug mode
+$debug = ENV['DEBUG'] == '1'
+
 $logger = Logger.new(STDOUT)
-$logger.level = Logger::INFO
+$logger.level = $debug ? Logger::DEBUG : Logger::INFO
 
 $cache = Diskcached.new
 
@@ -108,7 +111,7 @@ def zkb_request(params)
 
   $cache.cache(url) do
     response = Excon.get(url,
-      :debug   => true,
+      :debug   => $debug,
       :headers =>
         {
           'User-Agent'        => 'Maintainer: subfrowns <subfrowns@gmail.com>',
