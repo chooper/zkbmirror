@@ -13,7 +13,8 @@ module ZkbMirror
     @@logger = Logger.new(STDOUT)
     @@logger.level = @@debug ? Logger::DEBUG : Logger::INFO
     @@cache = Diskcached.new
-    @@database = Sequel.connect("sqlite://kills.db", :logger => @@logger)
+    @@database_url = ENV['DATABASE_URL'] || 'sqlite://kills.db'
+    @@database = Sequel.connect(@@database_url, :logger => @@logger)
     init_database
   end
 
