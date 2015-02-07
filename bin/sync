@@ -125,13 +125,11 @@ end
 def main
   init_database
   regions.each do |regionID|
-    interesting_ships.each do |shipTypeID|
-      response = zkb_request(pastSeconds: 86400, regionID: regionID, shipTypeID: shipTypeID)
-      if response[:status] == 200
-        body = decode(response[:body])
-        next if body.nil? or body.empty?
-        body.each { |kill| save_kill(kill) }
-      end
+    response = zkb_request(pastSeconds: 86400, regionID: regionID, shipTypeID: interesting_ships.join(','))
+    if response[:status] == 200
+      body = decode(response[:body])
+      next if body.nil? or body.empty?
+      body.each { |kill| save_kill(kill) }
     end
   end
 end
