@@ -1,0 +1,16 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    diskcached (1.1.0)
+    excon (0.44.1)
+    sequel (4.19.0)
+    sqlite3 (1.3.10)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  diskcached
+  excon
+  sequel
+  sqlite3
