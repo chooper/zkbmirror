@@ -122,8 +122,7 @@ def zkb_request(params)
   end
 end
 
-def main
-  init_database
+def sync
   regions.each do |regionID|
     response = zkb_request(pastSeconds: 86400, regionID: regionID, shipTypeID: interesting_ships.join(','))
     if response[:status] == 200
@@ -132,6 +131,11 @@ def main
       body.each { |kill| save_kill(kill) }
     end
   end
+end
+
+def main
+  init_database
+  sync
 end
 
 main
