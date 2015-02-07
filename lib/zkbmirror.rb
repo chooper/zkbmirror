@@ -7,21 +7,18 @@ require 'excon'
 require 'sequel'
 require 'diskcached'
 
-# check for debug mode
-$debug = ENV['DEBUG'] == '1'
-
-$logger = Logger.new(STDOUT)
-$logger.level = $debug ? Logger::DEBUG : Logger::INFO
-
-$cache = Diskcached.new
-
 module ZkbMirror
-  def self.database
-    $conn ||= Sequel.connect("sqlite://kills.db", :logger => $logger)
+  def self.init
+    @@debug = ENV['DEBUG'] == '1'
+    @@logger = Logger.new(STDOUT)
+    @@logger.level = @@debug ? Logger::DEBUG : Logger::INFO
+    @@cache = Diskcached.new
+    @@database = Sequel.connect("sqlite://kills.db", :logger => @@logger)
+    init_database
   end
 
   def self.init_database
-    database.create_table :kills do
+    @@database.create_table :kills do
       column :kill_id,            String,   primary_key: true
       column :kill_time,          Time
       column :solar_system_id,    String
@@ -35,7 +32,7 @@ module ZkbMirror
       column :alliance_name,      String
     end
 
-    database.create_table :kill_attackers do
+    @@database.create_table :kill_attackers do
       foreign_key :kill_id, :kills
       column :character_id,       String
       column :character_name,     String
@@ -57,8 +54,9 @@ module ZkbMirror
   end
 
   def self.regions
+    ## TODO sync this to the database instead of fetching on each run
     url = "http://www.evedata.org/JSON/marketRegionList.cgi"
-    $cache.cache(url) do
+    @@cache.cache(url) do
       response = Excon.get(url)
       decode(response.body).collect { |o| o["regionID"] }
     end
@@ -75,9 +73,9 @@ module ZkbMirror
   end
 
   def self.save_kill(kill)
-    database.transaction do
+    @@database.transaction do
 
-      exists = database[:kills][:kill_id => kill['killID']]
+      exists = @@database[:kills][:kill_id => kill['killID']]
       raise Sequel::Rollback if exists
 
       database[:kills].insert(
@@ -94,7 +92,7 @@ module ZkbMirror
         :alliance_name      => kill['victim']['allianceName'])
       
       kill['attackers'].each do |attacker|
-        database[:kill_attackers].insert(
+        @@database[:kill_attackers].insert(
           :kill_id            => kill['killID'],
           :character_id       => attacker['characterID'],
           :character_name     => attacker['characterName'],
@@ -110,9 +108,9 @@ module ZkbMirror
     url = "https://zkillboard.com/api/#{params.to_a.join('/')}/"
     # protip: you can bypass cache enforcement by joining/appending alliance IDs
 
-    $cache.cache(url) do
+    @@cache.cache(url) do
       response = Excon.get(url,
-        :debug   => $debug,
+        :debug   => @@debug,
         :headers =>
           {
             'User-Agent'        => 'Maintainer: subfrowns <subfrowns@gmail.com>',

@@ -9,7 +9,7 @@ require 'diskcached'
 require_relative '../lib/zkbmirror.rb'
 
 def main
-  ZkbMirror.init_database
+  ZkbMirror.init
   ZkbMirror.sync
 end
 
