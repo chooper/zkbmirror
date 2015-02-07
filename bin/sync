@@ -1,11 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-require 'logger'
-require 'json'
-require 'excon'
-require 'sequel'
-require 'diskcached'
 require_relative '../lib/zkbmirror.rb'
 
 def main
