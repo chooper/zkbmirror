@@ -20,6 +20,8 @@ def init_database
   database.create_table :kills do
     column :kill_id,            String,   primary_key: true
     column :kill_time,          Time
+    column :solar_system_id,    String
+    column :ship_type_id,       String
     column :victim,             String
     column :character_id,       String
     column :character_name,     String
@@ -77,6 +79,8 @@ def save_kill(kill)
     database[:kills].insert(
       :kill_id            => kill['killID'],
       :kill_time          => kill['killTime'],
+      :solar_system_id    => kill['solarSystemID'],
+      :ship_type_id       => kill['shipTypeID'],
       :victim             => kill['victim']['victim'],
       :character_id       => kill['victim']['characterID'],
       :character_name     => kill['victim']['characterName'],
