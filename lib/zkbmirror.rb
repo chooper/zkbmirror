@@ -75,7 +75,7 @@ module ZkbMirror
       exists = @@database[:kills][:kill_id => kill['killID']]
       raise Sequel::Rollback if exists
 
-      database[:kills].insert(
+      @@database[:kills].insert(
         :kill_id            => kill['killID'],
         :kill_time          => kill['killTime'],
         :solar_system_id    => kill['solarSystemID'],
