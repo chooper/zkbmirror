@@ -14,17 +14,27 @@ module ZkbMirror
     end
 
     def request(params)
+      log "ZkbApi request start; params = #{params.inspect}"
       url = "#{@base_url}#{params.to_a.join('/')}/"
+      result = nil
 
       @cache.cache(url) do
+        log "ZkbApi cache miss; params = #{params.inspect}"
         response = Excon.get(url,
           :debug   => @debug,
           :headers => @headers)
-        {:status => response.status, :headers => response.headers, :body => inflate(response.body)}
+        result = {:status => response.status, :headers => response.headers, :body => inflate(response.body)}
       end
+      log "ZkbApi request finish; status = #{result[:status]}, params = #{params.inspect}"
+      result
     end
 
     private
+
+    def log(msg)
+      return if @logger.nil?
+      @logger.info(msg)
+    end
 
     def default_headers
       {
