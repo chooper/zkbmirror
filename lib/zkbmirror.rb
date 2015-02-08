@@ -6,6 +6,7 @@ require 'json'
 require 'excon'
 require 'sequel'
 require 'diskcached'
+require_relative 'zkbmirror/zkb_api.rb'
 
 module ZkbMirror
   def self.init
@@ -63,11 +64,6 @@ module ZkbMirror
     end
   end
 
-  def self.inflate(string)
-    Zlib::GzipReader.new(StringIO.new(string)).read
-    rescue Zlib::GzipFile::Error
-      string
-  end
 
   def self.decode(string)
     JSON.parse(string)
@@ -105,26 +101,10 @@ module ZkbMirror
     end
   end
 
-  def self.zkb_request(params)
-    url = "https://zkillboard.com/api/#{params.to_a.join('/')}/"
-    # protip: you can bypass cache enforcement by joining/appending alliance IDs
-
-    @@cache.cache(url) do
-      response = Excon.get(url,
-        :debug   => @@debug,
-        :headers =>
-          {
-            'User-Agent'        => 'Maintainer: subfrowns <subfrowns@gmail.com>',
-            'Accept-Encoding'   => 'gzip',
-          }
-      )
-      {:status => response.status, :headers => response.headers, :body => inflate(response.body)}
-    end
-  end
-
   def self.sync
+    zkb = ZkbApi.new({}, @@cache, @@debug)
     regions.each do |regionID|
-      response = zkb_request(pastSeconds: 86400, regionID: regionID, shipTypeID: interesting_ships.join(','))
+      response = zkb.request(pastSeconds: 86400, regionID: regionID, shipTypeID: interesting_ships.join(','))
       if response[:status] == 200
         body = decode(response[:body])
         next if body.nil? or body.empty?
