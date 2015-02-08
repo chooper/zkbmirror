@@ -10,13 +10,17 @@ require_relative 'zkbmirror/zkb_api.rb'
 
 module ZkbMirror
   def self.init
+    init_env
+    init_database
+  end
+
+  def self.init_env
     @@debug = ENV['DEBUG'] == '1'
     @@logger = Logger.new(STDOUT)
     @@logger.level = @@debug ? Logger::DEBUG : Logger::INFO
     @@cache = Diskcached.new
     @@database_url = ENV['DATABASE_URL'] || 'sqlite://kills.db'
     @@database = Sequel.connect(@@database_url, :logger => @@logger)
-    init_database
   end
 
   def self.init_database
