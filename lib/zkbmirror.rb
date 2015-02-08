@@ -68,7 +68,6 @@ module ZkbMirror
     end
   end
 
-
   def self.decode(string)
     JSON.parse(string)
   end
