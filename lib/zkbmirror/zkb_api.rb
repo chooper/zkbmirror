@@ -5,10 +5,11 @@ require 'excon'
 
 module ZkbMirror
   class ZkbApi
-    def initialize(headers, cache, debug)
-      @headers = headers.merge(default_headers)
+    def initialize(logger, cache, debug, headers)
+      @logger = logger
       @cache = cache
       @debug = debug
+      @headers = headers.merge(default_headers)
       @base_url = 'https://zkillboard.com/api/'
     end
 

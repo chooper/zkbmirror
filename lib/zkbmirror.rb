@@ -105,7 +105,7 @@ module ZkbMirror
   end
 
   def self.sync
-    zkb = ZkbApi.new({}, @@cache, @@debug)
+    zkb = ZkbApi.new(@@logger, @@cache, @@debug, {})
     regions.each do |regionID|
       response = zkb.request(pastSeconds: 86400, regionID: regionID, shipTypeID: interesting_ships.join(','))
       next unless response[:status] == 200
