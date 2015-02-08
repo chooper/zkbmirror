@@ -73,6 +73,8 @@ module ZkbMirror
   end
 
   def self.save_kill(kill)
+    return if kill.nil?
+
     @@database.transaction do
 
       exists = @@database[:kills][:kill_id => kill['killID']]
@@ -109,8 +111,9 @@ module ZkbMirror
     regions.each do |regionID|
       response = zkb.request(pastSeconds: 86400, regionID: regionID, shipTypeID: interesting_ships.join(','))
       next unless response[:status] == 200
-      next if body.nil? or body.empty?
+      next if response[:body].nil? or response[:body].empty?
 
+      body = decode(response[:body])
       body.each { |k| save_kill(k) }
     end
   end
