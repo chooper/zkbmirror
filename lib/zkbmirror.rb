@@ -108,11 +108,10 @@ module ZkbMirror
     zkb = ZkbApi.new({}, @@cache, @@debug)
     regions.each do |regionID|
       response = zkb.request(pastSeconds: 86400, regionID: regionID, shipTypeID: interesting_ships.join(','))
-      if response[:status] == 200
-        body = decode(response[:body])
-        next if body.nil? or body.empty?
-        body.each { |kill| save_kill(kill) }
-      end
+      next unless response[:status] == 200
+      next if body.nil? or body.empty?
+
+      body.each { |k| save_kill(k) }
     end
   end
 end
