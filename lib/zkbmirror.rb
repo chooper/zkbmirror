@@ -107,14 +107,25 @@ module ZkbMirror
   end
 
   def self.sync
+    @@logger.info("Sync started; debug = #{@@debug}")
+    start_time = Time.new
     zkb = ZkbApi.new(@@logger, @@cache, @@debug, {})
+    num_kills = 0
+
     regions.each do |regionID|
       response = zkb.request(pastSeconds: 86400, regionID: regionID, shipTypeID: interesting_ships.join(','))
       next unless response[:status] == 200
       next if response[:body].nil? or response[:body].empty?
 
       body = decode(response[:body])
-      body.each { |k| save_kill(k) }
+      body.each do |k|
+        next if k.nil?
+        save_kill(k)
+        num_kills += 1
+      end
     end
+
+    duration = Time.new - start_time
+    @@logger.info("Sync complete; kill saved = #{num_kills}, took #{duration}s")
   end
 end
