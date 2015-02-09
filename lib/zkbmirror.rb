@@ -30,6 +30,9 @@ module ZkbMirror
       column :kill_id,            String,   primary_key: true
       column :kill_time,          Time
       column :solar_system_id,    String
+      column :solar_system_name,  String
+      column :region_id,          String
+      column :region_name,        String
       column :ship_type_id,       String
       column :victim,             String
       column :character_id,       String
@@ -72,6 +75,9 @@ module ZkbMirror
   def self.save_kill(kill)
     return if kill.nil?
 
+    solar_system = @@dump[:mapSolarSystems][:solarSystemID => kill['solarSystemID']]
+    region = @@dump[:mapRegions][:regionID => solar_system[:regionID]]
+
     @@database.transaction do
 
       exists = @@database[:kills][:kill_id => kill['killID']]
@@ -81,6 +87,9 @@ module ZkbMirror
         :kill_id            => kill['killID'],
         :kill_time          => kill['killTime'],
         :solar_system_id    => kill['solarSystemID'],
+        :solar_system_name  => solar_system[:solarSystemName],
+        :region_id          => region[:regionID],
+        :region_name        => region[:regionName],
         :ship_type_id       => kill['shipTypeID'],
         :victim             => kill['victim']['victim'],
         :character_id       => kill['victim']['characterID'],
