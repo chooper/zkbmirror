@@ -5,7 +5,6 @@ require 'logger'
 require 'json'
 require 'excon'
 require 'sequel'
-require 'diskcached'
 require_relative 'zkbmirror/zkb_api.rb'
 
 module ZkbMirror
@@ -18,7 +17,6 @@ module ZkbMirror
     @@debug = ENV['DEBUG'] == '1'
     @@logger = Logger.new(STDOUT)
     @@logger.level = @@debug ? Logger::DEBUG : Logger::INFO
-    @@cache = Diskcached.new
     @@database_url = ENV['DATABASE_URL'] || 'sqlite://kills.db'
     @@database = Sequel.connect(@@database_url, :logger => @@logger)
     @@dump_url = ENV['EVE_DUMP_URL'] || 'sqlite://universeDataDx.db'
@@ -115,7 +113,7 @@ module ZkbMirror
   def self.sync
     @@logger.info("Sync started; debug = #{@@debug}")
     start_time = Time.new
-    zkb = ZkbApi.new(@@logger, @@cache, @@debug, {})
+    zkb = ZkbApi.new(@@logger, @@debug, {})
     num_kills = 0
 
     regions.each do |regionID|

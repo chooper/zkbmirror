@@ -5,9 +5,8 @@ require 'excon'
 
 module ZkbMirror
   class ZkbApi
-    def initialize(logger, cache, debug, headers)
+    def initialize(logger, debug, headers)
       @logger = logger
-      @cache = cache
       @debug = debug
       @headers = headers.merge(default_headers)
       @base_url = 'https://zkillboard.com/api/'
@@ -16,15 +15,10 @@ module ZkbMirror
     def request(params)
       log "ZkbApi request start; params = #{params.inspect}"
       url = "#{@base_url}#{params.to_a.join('/')}/"
-      result = nil
-
-      @cache.cache(url) do
-        log "ZkbApi cache miss; params = #{params.inspect}"
-        response = Excon.get(url,
-          :debug   => @debug,
-          :headers => @headers)
-        result = {:status => response.status, :headers => response.headers, :body => inflate(response.body)}
-      end
+      response = Excon.get(url,
+        :debug   => @debug,
+        :headers => @headers)
+      result = {:status => response.status, :headers => response.headers, :body => inflate(response.body)}
       log "ZkbApi request finish; status = #{result[:status]}, params = #{params.inspect}"
       result
     end
