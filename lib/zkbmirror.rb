@@ -21,6 +21,8 @@ module ZkbMirror
     @@cache = Diskcached.new
     @@database_url = ENV['DATABASE_URL'] || 'sqlite://kills.db'
     @@database = Sequel.connect(@@database_url, :logger => @@logger)
+    @@dump_url = ENV['EVE_DUMP_URL'] || 'sqlite://universeDataDx.db'
+    @@dump = Sequel.connect(@@dump_url, :logger => @@logger)
   end
 
   def self.init_database
@@ -60,12 +62,7 @@ module ZkbMirror
   end
 
   def self.regions
-    ## TODO sync this to the database instead of fetching on each run
-    url = "http://www.evedata.org/JSON/marketRegionList.cgi"
-    @@cache.cache(url) do
-      response = Excon.get(url)
-      decode(response.body).collect { |o| o["regionID"] }
-    end
+    @@dump[:mapRegions].select(:regionID).all.collect { |x| x.values }
   end
 
   def self.decode(string)
