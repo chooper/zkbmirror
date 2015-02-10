@@ -19,7 +19,7 @@ module ZkbMirror
     @@logger.level = @@debug ? Logger::DEBUG : Logger::INFO
     @@database_url = ENV['DATABASE_URL'] || 'sqlite://kills.db'
     @@database = Sequel.connect(@@database_url, :logger => @@logger)
-    @@dump_url = ENV['EVE_DUMP_URL'] || 'sqlite://universeDataDx.db'
+    @@dump_url = ENV['EVE_DUMP_URL'] || ENV['DATABASE_URL'] || 'sqlite://universeDataDx.db'
     @@dump = Sequel.connect(@@dump_url, :logger => @@logger)
   end
 
