@@ -17,6 +17,7 @@ module ZkbMirror
     @@debug = ENV['DEBUG'] == '1'
     @@logger = Logger.new(STDOUT)
     @@logger.level = @@debug ? Logger::DEBUG : Logger::INFO
+    @@past_seconds = ENV['ZKB_PAST_SECONDS'] || '86400'
     @@database_url = ENV['DATABASE_URL'] || 'sqlite://kills.db'
     @@database = Sequel.connect(@@database_url, :logger => @@logger)
     @@dump_url = ENV['EVE_DUMP_URL'] || ENV['DATABASE_URL'] || 'sqlite://universeDataDx.db'
@@ -117,7 +118,7 @@ module ZkbMirror
     num_kills = 0
 
     regions.each do |regionID|
-      response = zkb.request(pastSeconds: 86400, regionID: regionID, shipTypeID: interesting_ships.join(','))
+      response = zkb.request(pastSeconds: @@past_seconds, regionID: regionID, shipTypeID: interesting_ships.join(','))
       next unless response[:status] == 200
       next if response[:body].nil? or response[:body].empty?
 
