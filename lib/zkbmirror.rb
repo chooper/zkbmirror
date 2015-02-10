@@ -25,29 +25,29 @@ module ZkbMirror
 
   def self.init_database
     @@database.create_table :kills do
-      column :kill_id,            String,   primary_key: true
+      column :kill_id,            Integer,   primary_key: true
       column :kill_time,          Time
-      column :solar_system_id,    String
+      column :solar_system_id,    Integer
       column :solar_system_name,  String
-      column :region_id,          String
+      column :region_id,          Integer
       column :region_name,        String
-      column :ship_type_id,       String
+      column :ship_type_id,       Integer
       column :victim,             String
-      column :character_id,       String
+      column :character_id,       Integer
       column :character_name,     String
-      column :corporation_id,     String
+      column :corporation_id,     Integer
       column :corporation_name,   String
-      column :alliance_id,        String
+      column :alliance_id,        Integer
       column :alliance_name,      String
     end
 
     @@database.create_table :kill_attackers do
       foreign_key :kill_id, :kills
-      column :character_id,       String
+      column :character_id,       Integer
       column :character_name,     String
-      column :corporation_id,     String
+      column :corporation_id,     Integer
       column :corporation_name,   String
-      column :alliance_id,        String
+      column :alliance_id,        Integer
       column :alliance_name,      String
     end
     rescue Sequel::DatabaseError
