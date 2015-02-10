@@ -118,15 +118,25 @@ module ZkbMirror
     num_kills = 0
 
     regions.each do |regionID|
-      response = zkb.request(pastSeconds: @@past_seconds, regionID: regionID, shipTypeID: interesting_ships.join(','))
-      next unless response[:status] == 200
-      next if response[:body].nil? or response[:body].empty?
+      page = 1
 
-      body = decode(response[:body])
-      body.each do |k|
-        next if k.nil?
-        save_kill(k)
-        num_kills += 1
+      while true do
+        response = zkb.request(pastSeconds: @@past_seconds, regionID: regionID, shipTypeID: interesting_ships.join(','), page: page)
+
+        break unless response[:status] == 200
+        break if response[:body].nil? or response[:body].empty?
+
+        body = decode(response[:body])
+        break if body.nil? or body.empty?
+
+        body.each do |k|
+          next if k.nil?
+          save_kill(k)
+          num_kills += 1
+        end
+
+        break unless body.length == 200
+        page += 1
       end
     end
 
