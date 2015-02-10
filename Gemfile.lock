@@ -2,7 +2,11 @@ GEM
   remote: https://rubygems.org/
   specs:
     excon (0.44.1)
+    pg (0.18.1)
     sequel (4.19.0)
+    sequel_pg (1.6.11)
+      pg (>= 0.8.0)
+      sequel (>= 3.39.0)
     sqlite3 (1.3.10)
 
 PLATFORMS
@@ -10,5 +14,7 @@ PLATFORMS
 
 DEPENDENCIES
   excon
+  pg
   sequel
+  sequel_pg
   sqlite3
